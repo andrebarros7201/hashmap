@@ -96,6 +96,16 @@ class HashMap {
     }
     return undefined;
   }
+
+  has(key) {
+    const index = this._hash(key);
+    let node = this.array[index];
+    while (node) {
+      if (node.key === key) return true;
+      node = node.next;
+    }
+    return false;
+  }
 }
 
 export { HashMap };
