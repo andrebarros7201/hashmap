@@ -8,12 +8,12 @@ class Node {
 
 class HashMap {
   constructor() {
-    this.loadFactor = 0.75;
-    this.bucketArray = new Array(16);
     this.size = 0;
+    this.array = new Array(16);
+    this.loadFactor = 0.75;
   }
 
-  hash(key) {
+  _hash(key) {
     let hashCode = 0;
     const primeNumber = 31;
     for (let i = 0; i < key.length; i++) {
@@ -23,46 +23,59 @@ class HashMap {
   }
 
   _resize() {
-    const oldArray = this.bucketArray;
-    const newArray = new Array(this.bucketArray.length * 2);
-    this.bucketArray = newArray;
+    const oldArray = this.array;
+    let newArray = new Array(this.array.length * 2);
+    this.array = newArray;
     this.size = 0;
 
-    for (let bucket of oldArray) {
+    for (const bucket of oldArray) {
       let node = bucket;
       while (node) {
-        this._insert(node.key, node.value, newArray);
+        this._insert(node.key, node.value);
         node = node.next;
       }
     }
   }
 
-  _insert(key, value, array) {
-    const index = this.hash(key);
-    if (!array[index]) {
-      array[key] = new Node(key, value);
+  _insert(key, value) {
+    const index = this._hash(key);
+
+    if (!this.array[index]) {
+      this.array[index] = new Node(key, value);
     } else {
-      let node = array[index];
-      while (node) {
-        if (node.key === key) {
-          node.value = value;
-          return;
-        }
-        if (!node.next) {
-          node.next = new Node(key, value);
-          return;
-        }
-        node = node.next;
+      let node = this.array[index];
+      if (node.key === key) {
+        node.value = value;
+        return;
       }
+      if (!node.next) {
+        node.next = new Node(key, value);
+        return;
+      }
+      node = node.next;
     }
     this.size++;
   }
 
   set(key, value) {
-    if (this.size / this.bucketArray.length >= this.loadFactor) {
-      this._resize();
+    if (this.size / this.array.length >= this.loadFactor) {
+      resize();
     }
-    this._insert(key, value, this.bucketArray);
+    this._insert(key, value);
+  }
+
+  get(key) {
+    const index = this._hash(key);
+    if (!this.array[index]) {
+      return `Doesn't exist`;
+    }
+    let node = this.array[index];
+    while (node) {
+      if (node.key === key) {
+        return node.value;
+      }
+      node = node.next;
+    }
   }
 }
 
