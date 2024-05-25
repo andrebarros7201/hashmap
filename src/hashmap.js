@@ -77,6 +77,25 @@ class HashMap {
       node = node.next;
     }
   }
+
+  delete(key) {
+    const index = this._hash(key);
+    let node = this.array[index];
+    let prev = null;
+    while (node) {
+      if (node.key === key) {
+        if (prev) {
+          prev.next = node.next;
+        } else {
+          this.array[index] = node.node;
+        }
+        this.size--;
+      }
+      prev = node;
+      node = node.next;
+    }
+    return undefined;
+  }
 }
 
 export { HashMap };
